@@ -1,0 +1,18 @@
+Name,Description,Owner,Members,Tags
+#Configure Projects,,,,
+# Use this sheet to define settings for Projects to be created in OneSphere.  ,,,,
+# If the row starts with '#' it will be ignored by the script,,,,
+# For specific settings - See Definition below,,,,
+,,,,
+"# List of project names 
+","# Project Description
+","# Project Owner email Id
+","# List of associated members 
+# defined for a given project
+# Use '| as separator
+","# List of Tag keys and their values
+# defined for a given project
+# Use '| as separator
+#Possible keys(environment,line-of-business,tier)"
+,,,,
+FromExcelSheet1,TestProject,pramod.sareddy@hpe.com,didier.lalli@hpe.com|syed.said@hpe.com,environment=demonstration|line-of-business=incubation|tier=gold

@@ -1,0 +1,6 @@
+[Setup]
+Lang=en
+NoIcons=0
+
+; Change to 0 for JustMe -> %UserProfile%\Documents\WindowsPowerShell\Modules
+Users=1 

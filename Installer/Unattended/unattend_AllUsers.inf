@@ -1,0 +1,6 @@
+[Setup]
+Lang=en
+NoIcons=0
+
+; Change to 1 for AllUsers -> %WINDIR%\System32\WindowsPowerShell\v1\Modules
+Users=0

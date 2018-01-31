@@ -1,0 +1,16 @@
+Name,Email,Password,Role
+#Create Users,,,
+# Use this sheet to define settings for Users to be created in OneSphere.  ,,,
+# If the row starts with '#' it will be ignored by the script,,,
+# For specific settings - See Definition below,,,
+,,,
+"# List of user names 
+","# List of Email Id's 
+","# Password for the User login
+","# List of associated roles are 'administrator','analyst','project-creator','consumer'
+"
+,,,
+ExcelUser1,ExcelUser1@hpe.com,Passw0rd!,administrator
+ExcelUser2,ExcelUser2@hpe.com,Passw0rd!,analyst
+ExcelUser3,ExcelUser3@hpe.com,Passw0rd!,project-creator
+ExcelUser4,ExcelUser4@hpe.com,Passw0rd!,consumer
