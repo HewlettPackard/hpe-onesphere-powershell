@@ -38,8 +38,8 @@ Param
 
 $ErrorActionPreference = 'Continue'
 
-remove-module hpeonesphere
-import-module  hpeonesphere
+#remove-module hpeonesphere
+import-module hpeonesphere
 
 
 $secpasswd = ConvertTo-SecureString $Password -AsPlainText -Force
