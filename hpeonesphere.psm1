@@ -713,8 +713,8 @@ function Get-HPEOSRegion
 Retrieves Zone from OneSphere Management portal
 .PARAMETER ZoneId
 Optional: Zone id to retrieve
-.PARAMETER Query
-Optional: Query string to prune zones by
+.PARAMETER Provider
+Optional: Provider object to prune zones by
 .PARAMETER Region
 Optional: The region to prune zones by
 .PARAMETER Appliance
@@ -746,7 +746,7 @@ function Get-HPEOSZone
      
         [Parameter(Mandatory=$False, ParameterSetName = "List")]
         [alias ('filter')]
-		[string]$Query,
+		[Object]$Provider,
         
         [Parameter(Mandatory=$False, ParameterSetName = "List")]
         [Object]$Region,
@@ -792,7 +792,7 @@ function Get-HPEOSZone
                 }
 
                 if ($Query) {
-                    $FullUriSuffix = $FullUriSuffix + $SuffixChar + (EncodeQuery "Query" $Query)
+                    $FullUriSuffix = $FullUriSuffix + $SuffixChar + (EncodeQuery "providerUri" $Provider.uri)
                 }
             }        
             
@@ -5047,7 +5047,7 @@ Optional: If External IP is required
 .DESCRIPTION
 Adds Deployment to OneSphere Management portal. Assumes portal is already connected
 .EXAMPLE
-Add-HPEOSDeployment -DeploymentName $VMname -Project $HOLProjObj -Service $HOLservice -VirtualMachineProfile $VMprofile -Zone $HOLprivZone -Networks $HOLnetworkObj -ExternalIp
+Add-HPEOSDeployment -DeploymentName $VMname -Project $HOLProjObj -Service $HOLservice -VirtualMachineProfile $VMprofile -Zone $HOLprivZone -Networks $HOLnetworkObj -NeedExternalIp
 .Notes
     NAME: ADD-HPEOSDeployment
     LASTEDIT: 
