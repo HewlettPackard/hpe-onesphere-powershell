@@ -791,7 +791,7 @@ function Get-HPEOSZone
                     $SuffixChar="&"
                 }
 
-                if ($Query) {
+                if ($Provider) {
                     $FullUriSuffix = $FullUriSuffix + $SuffixChar + (EncodeQuery "providerUri" $Provider.uri)
                 }
             }        
