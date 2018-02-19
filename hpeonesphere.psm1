@@ -21,7 +21,7 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+OUT OF OR IN CONNECTION WITH THE ShOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 #>
@@ -151,8 +151,7 @@ $Script:PatchOperationReplace       = "replace"
 											 '(/0*([1-9]|[12][0-9]|3[0-2]))?$'
 
 $Global:HPEOSHeaders = @{}
-$Global:HPEOSHeaders["Accept"] = "application/json"
-$Global:HPEOSHeaders["Content-Type"] = "application/json"
+
 [string]$Global:HPEOSHostname
 [boolean]$Global:HPEOSPortalConnected  = $false
 
@@ -246,10 +245,11 @@ function Connect-HPEOS
 
 	)
 
-    
-
     Process
     {
+        $Global:HPEOSHeaders["Accept"] = "application/json"
+        $Global:HPEOSHeaders["Content-Type"] = "application/json"
+
         $AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls,Tls11,Tls12'
         [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
 
@@ -327,6 +327,9 @@ function Disconnect-HPEOS
         }
         write-verbose "Disconnected from OneSphere portal !"
         $Global:HPEOSHeaders["Authorization"] = ""
+        $Global:HPEOSHeaders["Accept"] = ""
+        $Global:HPEOSHeaders["Content-Type"] = ""
+        
         $Global:HPEOSHostname = "" 
         $Global:HPEOSPortalConnected  = $False
     }
@@ -713,8 +716,8 @@ function Get-HPEOSRegion
 Retrieves Zone from OneSphere Management portal
 .PARAMETER ZoneId
 Optional: Zone id to retrieve
-.PARAMETER Query
-Optional: Query string to prune zones by
+.PARAMETER Provider
+Optional: Provider object to prune zones by
 .PARAMETER Region
 Optional: The region to prune zones by
 .PARAMETER Appliance
@@ -746,7 +749,7 @@ function Get-HPEOSZone
      
         [Parameter(Mandatory=$False, ParameterSetName = "List")]
         [alias ('filter')]
-		[string]$Query,
+		[Object]$Provider,
         
         [Parameter(Mandatory=$False, ParameterSetName = "List")]
         [Object]$Region,
@@ -791,8 +794,8 @@ function Get-HPEOSZone
                     $SuffixChar="&"
                 }
 
-                if ($Query) {
-                    $FullUriSuffix = $FullUriSuffix + $SuffixChar + (EncodeQuery "Query" $Query)
+                if ($Provider) {
+                    $FullUriSuffix = $FullUriSuffix + $SuffixChar + (EncodeQuery "providerUri" $Provider.uri)
                 }
             }        
             
@@ -3443,24 +3446,6 @@ function Remove-HPEOSProject
 
 <#
 .SYNOPSIS
-Deletes Deployment from OneSphere Management portal
-.PARAMETER InputObject
-Deployment object to delete
-.DESCRIPTION
-Deletes Deployment from OneSphere Management portal. Assumes portal is already connected
-.EXAMPLE
-REMOVE-HPEOSDeployment -Deployment $myDeployment
-.Notes
-    NAME:  REMOVE-HPEOSDeployment
-    LASTEDIT: 
-    KEYWORDS: OneSphere 
-  
-.Link
-     http://www.hpe.com/onesphere
-#>
-
-<#
-.SYNOPSIS
 Deletes TagKey from OneSphere Management portal
 .PARAMETER InputObject
 TagKey object to delete
@@ -4629,13 +4614,18 @@ function Set-HPEOSNetwork
         )
         }
 
+        $CustomHeaders = @{}
+        $CustomHeaders["Accept"] = "application/json"
+        $CustomHeaders["Content-Type"] = "application/json-patch+json"
+        $CustomHeaders["Authorization"] = $Global:HPEOSHeaders["Authorization"]
+
         $jsonbody = ConvertTo-Json -InputObject $body
         $FullUri = $Global:HPEOSHostname + $Network.uri
         write-debug "FullUri is $FullUri"                 
         write-debug $jsonbody
 
         try {
-            $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -body $jsonbody -Method PATCH
+            $res = invoke-RestMethod -Uri $FullUri -Headers $CustomHeaders -body $jsonbody -Method PATCH
             Write-verbose "Network patched successfully"
             write-output $res
         }
@@ -4780,8 +4770,10 @@ function Set-HPEOSZone
             )
         
                 
-        $CustomHeaders=$Global:HPEOSHeaders
+        $CustomHeaders = @{}
+        $CustomHeaders["Accept"] = "application/json"
         $CustomHeaders["Content-Type"] = "application/json-patch+json"
+        $CustomHeaders["Authorization"] = $Global:HPEOSHeaders["Authorization"]
 
         $jsonbody = ConvertTo-Json -InputObject $body
         $FullUri = $Global:HPEOSHostname + $Zone.uri
@@ -4866,9 +4858,10 @@ function Set-HPEOSprovider
                 }
             )
         
-                
-        $CustomHeaders=$Global:HPEOSHeaders
+        $CustomHeaders = @{}
+        $CustomHeaders["Accept"] = "application/json"
         $CustomHeaders["Content-Type"] = "application/json-patch+json"
+        $CustomHeaders["Authorization"] = $Global:HPEOSHeaders["Authorization"]
 
         $jsonbody = ConvertTo-Json -InputObject $body
         $FullUri = $Global:HPEOSHostname + $Provider.uri
@@ -4953,8 +4946,10 @@ function Set-HPEOSRegion
                 }
             )
     
-        $CustomHeaders=$Global:HPEOSHeaders
+        $CustomHeaders = @{}
+        $CustomHeaders["Accept"] = "application/json"
         $CustomHeaders["Content-Type"] = "application/json-patch+json"
+        $CustomHeaders["Authorization"] = $Global:HPEOSHeaders["Authorization"]
 
         $jsonbody = ConvertTo-Json -InputObject $body
         $FullUri = $Global:HPEOSHostname + $Region.uri
@@ -5014,17 +5009,23 @@ function Remove-HPEOSCatalog
     {
         if ($InputObject)
             {
+            if (!(ValidateObjectType $InputObject "catalog")){
+                Throw "Object is not a valid catalog!"
+            }
+
             $FullUri = $Global:HPEOSHostname + $InputObject.uri 
             write-debug "FullUri is $FullUri"  
-    
-            try {
-                $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method DELETE
-                write-debug "Response from API call: $res"  
-                }
-            catch 
-                {
-                write-verbose  "Error deleting object from OneSphere portal"
-                $PSCmdlet.ThrowTerminatingError($_)
+            
+            if ($PSCmdlet.ShouldProcess($InputObject.name)) {
+                try {
+                    $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method DELETE
+                    write-debug "Response from API call: $res"  
+                    }
+                catch 
+                    {
+                    write-verbose  "Error deleting object from OneSphere portal"
+                    $PSCmdlet.ThrowTerminatingError($_)
+                    }
                 }   
             }
         else 
@@ -5032,7 +5033,7 @@ function Remove-HPEOSCatalog
             Write-Verbose "No object specified for deletion"
             $PSCmdlet.ThrowTerminatingError($_)
             }   
-        }
+    }
 }
 
 
@@ -5041,15 +5042,27 @@ function Remove-HPEOSCatalog
 Adds Deployment to OneSphere Management portal
 .PARAMETER DeploymentName
 Deployment name
+.PARAMETER Project
+Project to deploy to
+.PARAMETER Service
+Service to deploy
+.PARAMETER VirtualMachineProfile
+VirtualMachineProfile to deploy
+.PARAMETER Zone
+Zone to deploy to
+.PARAMETER Networks
+List of Networks to connect to
+.PARAMETER NeedExternalIP
+Optional: If External IP is required 
 .DESCRIPTION
 Adds Deployment to OneSphere Management portal. Assumes portal is already connected
 .EXAMPLE
-Add-HPEOSDeployment -name myNewDeploy TBD
+Add-HPEOSDeployment -DeploymentName $VMname -Project $HOLProjObj -Service $HOLservice -VirtualMachineProfile $VMprofile -Zone $HOLprivZone -Networks $HOLnetworkObj -NeedExternalIp
 .Notes
-    NAME:  ADD-HPEOSCatalog
+    NAME: ADD-HPEOSDeployment
     LASTEDIT: 
     KEYWORDS: OneSphere 
-  
+
 .Link
      http://www.hpe.com/onesphere
 #>
@@ -5094,7 +5107,7 @@ function Add-HPEOSDeployment
         [string]$PublicKey,
 
         [Parameter (Mandatory=$false)]
-		[switch]$ExternalIp = $true
+		[switch]$NeedExternalIp
     )
 
     begin 
@@ -5105,10 +5118,18 @@ function Add-HPEOSDeployment
         }
     }
 
+
+
     Process
         {
+        if ($NeedExternalIp) {
+            $SetExternalIp = $true
+        } else {
+            $SetExternalIp = $false
+        }
+
         $body = @{
-            "assignExternalIP" = $ExternalIp
+            "assignExternalIP" = $SetExternalIp
             "publicKey" = $PublicKey
             "name" = $DeploymentName
             "zoneUri" = $Zone.uri
@@ -5116,7 +5137,7 @@ function Add-HPEOSDeployment
             "serviceUri" = $Service.uri
             "regionUri" = $Region.uri
             "virtualMachineProfileUri" = $VirtualMachineProfile.uri
-        }
+            }
      
         $networkbody = @()
         foreach ($net in $Networks)
@@ -5134,15 +5155,15 @@ function Add-HPEOSDeployment
 
         try {
             $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -body $jsonbody -Method POST
-            Write-verbose "Catalog added successfully"
+            Write-verbose "Deployment added successfully"
             write-output $res
-        }
+            }
         catch
-        {
-            write-verbose  "Failed to create Catalog" 
+            {
+            write-verbose  "Failed to create deployment" 
             $PSCmdlet.ThrowTerminatingError($_)
-        }   
-    }   
+            }   
+        }
 }
 
 function ActionForDeployment
@@ -5651,18 +5672,24 @@ function Remove-HPEOSDeployment
     {
         if ($InputObject)
             {
+            if (!(ValidateObjectType $InputObject "deployment")){
+                Throw "Object is not a valid deployment!"
+            }
+
             $FullUri = $Global:HPEOSHostname + $InputObject.uri 
             write-debug "FullUri is $FullUri"  
     
-            try {
-                $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method DELETE
-                write-debug "Response from API call: $res"  
-                }
-            catch 
-                {
-                write-verbose  "Error deleting object from OneSphere portal"
-                $PSCmdlet.ThrowTerminatingError($_)
-                }   
+            if ($PSCmdlet.ShouldProcess($InputObject.name)) {
+                try {
+                    $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method DELETE
+                    write-debug "Response from API call: $res"  
+                    }
+                catch 
+                    {
+                    write-verbose  "Error deleting object from OneSphere portal"
+                    $PSCmdlet.ThrowTerminatingError($_)
+                    }  
+                } 
             }
         else 
             {
@@ -5778,7 +5805,7 @@ REMOVE-HPEOSVolume- $myVolume
 #>
 function Remove-HPEOSVolume
 {
-   	[CmdletBinding ()]
+   	[CmdletBinding (SupportsShouldProcess=$True)]
 	Param 
 	(
 		[Parameter (Mandatory, ValueFromPipeline)]
@@ -5798,18 +5825,24 @@ function Remove-HPEOSVolume
     {
         if ($InputObject)
             {
+            if (!(ValidateObjectType $InputObject "volume")){
+                Throw "Object is not a valid volume!"
+            }
+
             $FullUri = $Global:HPEOSHostname + $InputObject.uri 
             write-debug "FullUri is $FullUri"  
     
-            try {
-                $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method DELETE
-                write-debug "Response from API call: $res"  
+            if ($PSCmdlet.ShouldProcess($InputObject.name)) {                
+                try {
+                    $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method DELETE
+                    write-debug "Response from API call: $res"  
+                    }
+                catch 
+                    {
+                    write-verbose  "Error deleting object from OneSphere portal"
+                    $PSCmdlet.ThrowTerminatingError($_)
+                    }   
                 }
-            catch 
-                {
-                write-verbose  "Error deleting object from OneSphere portal"
-                $PSCmdlet.ThrowTerminatingError($_)
-                }   
             }
         else 
             {
@@ -6077,6 +6110,10 @@ function Get-HPEOSMetric
 		[ValidateNotNullorEmpty()]
 		[string]$Query,
 
+        [Parameter (Mandatory=$false, ParameterSetName = "Category")]
+		[ValidateNotNullorEmpty()]
+        [string]$GroupBy,
+        
         [Parameter (Mandatory, ParameterSetName = "Category")]
         [Parameter (Mandatory, ParameterSetName = "Resource")]
         [ValidateNotNullorEmpty()]
@@ -6089,28 +6126,16 @@ function Get-HPEOSMetric
         [alias ('start')]
         [string]$PeriodStart,
         
-        [Parameter (Mandatory, ParameterSetName = "Category")]
-        [Parameter (Mandatory, ParameterSetName = "Resource")]
+        [Parameter (Mandatory=$false, ParameterSetName = "Category")]
+        [Parameter (Mandatory=$false, ParameterSetName = "Resource")]
 		[ValidateSet('month', 'day', 'hour')]
         [string]$Period,
         
-        [Parameter (Mandatory, ParameterSetName = "Category")]
-        [Parameter (Mandatory, ParameterSetName = "Resource")]
+        [Parameter (Mandatory=$false, ParameterSetName = "Category")]
+        [Parameter (Mandatory=$false, ParameterSetName = "Resource")]
 		[ValidateNotNullorEmpty()]
         [alias ('count')]
         [int]$PeriodCount,
-
-        [Parameter (Mandatory=$false, ParameterSetName = "Category")]
-        [Parameter (Mandatory=$false, ParameterSetName = "Resource")]
-		[ValidateNotNullorEmpty()]
-        [alias ('resstart')]
-        [string]$ResultStart,
-        
-        [Parameter (Mandatory=$false, ParameterSetName = "Category")]
-        [Parameter (Mandatory=$false, ParameterSetName = "Resource")]
-		[ValidateNotNullorEmpty()]
-        [alias ('rescount')]
-        [int]$ResultCount,
 
         [Parameter (Mandatory=$false, ParameterSetName = "Category")]
         [Parameter (Mandatory=$false, ParameterSetName = "Resource")]
@@ -6168,15 +6193,6 @@ function Get-HPEOSMetric
             $UrlFilter += "&periodCount=" + $PeriodCount     
             }
             
-        if ($ResultStart)
-            {
-            $UrlFilter += "&start=" + $ResultStart     
-            }
-
-        if ($ResultCount)
-            {
-            $UrlFilter += "&count=" + $ResultCount     
-            }
 
         if ($Full) 
             {

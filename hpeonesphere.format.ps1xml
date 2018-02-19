@@ -593,8 +593,8 @@ THE SOFTWARE.
               </TableColumnItem>
               <TableColumnItem>
                 <ScriptBlock>
-                  $FullUri = $Global:Hostname  + $_.resourceUri
-                  $res = invoke-RestMethod -Uri $FullUri -Headers $Global:Headers -Method GET
+                  $FullUri = $Global:HPEOSHostname  + $_.resourceUri
+                  $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method GET
                   $res.name
                 </ScriptBlock>
               </TableColumnItem>
@@ -1133,8 +1133,8 @@ THE SOFTWARE.
               <TableColumnItem>
                 <ScriptBlock>if (-not($_.tagKeyUri)) { 'No TagKey' }
                   else {
-                          $FullUri = $Global:Hostname + $_.tagKeyUri
-                          $res = invoke-RestMethod -Uri $FullUri -Headers $Global:Headers -Method GET
+                          $FullUri = $Global:HPEOSHostname + $_.tagKeyUri
+                          $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method GET
                           $res.name                        }</ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
