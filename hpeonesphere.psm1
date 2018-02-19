@@ -21,7 +21,7 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+OUT OF OR IN CONNECTION WITH THE ShOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 #>
@@ -151,8 +151,7 @@ $Script:PatchOperationReplace       = "replace"
 											 '(/0*([1-9]|[12][0-9]|3[0-2]))?$'
 
 $Global:HPEOSHeaders = @{}
-$Global:HPEOSHeaders["Accept"] = "application/json"
-$Global:HPEOSHeaders["Content-Type"] = "application/json"
+
 [string]$Global:HPEOSHostname
 [boolean]$Global:HPEOSPortalConnected  = $false
 
@@ -246,10 +245,11 @@ function Connect-HPEOS
 
 	)
 
-    
-
     Process
     {
+        $Global:HPEOSHeaders["Accept"] = "application/json"
+        $Global:HPEOSHeaders["Content-Type"] = "application/json"
+
         $AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls,Tls11,Tls12'
         [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
 
@@ -327,6 +327,9 @@ function Disconnect-HPEOS
         }
         write-verbose "Disconnected from OneSphere portal !"
         $Global:HPEOSHeaders["Authorization"] = ""
+        $Global:HPEOSHeaders["Accept"] = ""
+        $Global:HPEOSHeaders["Content-Type"] = ""
+        
         $Global:HPEOSHostname = "" 
         $Global:HPEOSPortalConnected  = $False
     }
@@ -4611,8 +4614,10 @@ function Set-HPEOSNetwork
         )
         }
 
-        $CustomHeaders=$Global:HPEOSHeaders
+        $CustomHeaders = @{}
+        $CustomHeaders["Accept"] = "application/json"
         $CustomHeaders["Content-Type"] = "application/json-patch+json"
+        $CustomHeaders["Authorization"] = $Global:HPEOSHeaders["Authorization"]
 
         $jsonbody = ConvertTo-Json -InputObject $body
         $FullUri = $Global:HPEOSHostname + $Network.uri
@@ -4765,8 +4770,10 @@ function Set-HPEOSZone
             )
         
                 
-        $CustomHeaders=$Global:HPEOSHeaders
+        $CustomHeaders = @{}
+        $CustomHeaders["Accept"] = "application/json"
         $CustomHeaders["Content-Type"] = "application/json-patch+json"
+        $CustomHeaders["Authorization"] = $Global:HPEOSHeaders["Authorization"]
 
         $jsonbody = ConvertTo-Json -InputObject $body
         $FullUri = $Global:HPEOSHostname + $Zone.uri
@@ -4851,9 +4858,10 @@ function Set-HPEOSprovider
                 }
             )
         
-                
-        $CustomHeaders=$Global:HPEOSHeaders
+        $CustomHeaders = @{}
+        $CustomHeaders["Accept"] = "application/json"
         $CustomHeaders["Content-Type"] = "application/json-patch+json"
+        $CustomHeaders["Authorization"] = $Global:HPEOSHeaders["Authorization"]
 
         $jsonbody = ConvertTo-Json -InputObject $body
         $FullUri = $Global:HPEOSHostname + $Provider.uri
@@ -4938,8 +4946,10 @@ function Set-HPEOSRegion
                 }
             )
     
-        $CustomHeaders=$Global:HPEOSHeaders
+        $CustomHeaders = @{}
+        $CustomHeaders["Accept"] = "application/json"
         $CustomHeaders["Content-Type"] = "application/json-patch+json"
+        $CustomHeaders["Authorization"] = $Global:HPEOSHeaders["Authorization"]
 
         $jsonbody = ConvertTo-Json -InputObject $body
         $FullUri = $Global:HPEOSHostname + $Region.uri
