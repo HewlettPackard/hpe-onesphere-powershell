@@ -309,7 +309,8 @@ Param ([string]$OSUsersCSV =".\ImportOneSphereCSV\Users.csv")
 				if($ThisUser){
 				write-host -foreground Cyan "-------------------------------------------------------------"
                 write-host -foreground Cyan "Created User $FullName" 
-                write-host -foreground Cyan "-------------------------------------------------------------"				
+                write-host -foreground Cyan "-------------------------------------------------------------"
+				RESET-HPEOSPassword -email $EmailId				
                 }
 				
             }else{
