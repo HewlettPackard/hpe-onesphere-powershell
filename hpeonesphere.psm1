@@ -5107,6 +5107,10 @@ function Add-HPEOSDeployment
         [string]$PublicKey,
 
         [Parameter (Mandatory=$false)]
+		[ValidateNotNullorEmpty()]
+        [string]$UserData,
+
+        [Parameter (Mandatory=$false)]
 		[switch]$NeedExternalIp
     )
 
@@ -5136,6 +5140,7 @@ function Add-HPEOSDeployment
             "projectUri" = $Project.uri
             "serviceUri" = $Service.uri
             "regionUri" = $Region.uri
+            "userData" = $UserData
             "virtualMachineProfileUri" = $VirtualMachineProfile.uri
             }
      
