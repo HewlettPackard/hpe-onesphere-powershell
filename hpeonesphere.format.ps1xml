@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 <Configuration>
-  <ViewDefinitions>
+<ViewDefinitions>
     <View>
       <Name>Provider</Name>
       <ViewSelectedBy>
@@ -121,7 +121,59 @@ THE SOFTWARE.
         </TableRowEntries>
       </TableControl>
     </View>
-
+    <View>
+      <Name>BillingAccount</Name>
+      <ViewSelectedBy>
+        <TypeName>hpeonesphere.BillingAccount</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <AutoSize />
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Id</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Name</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>DirectoryUri</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Status</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>State</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <Wrap />
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>id</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>directoryUri</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>status</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>state</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
     <View>
       <Name>ProviderFull</Name>
       <ViewSelectedBy>
@@ -139,7 +191,7 @@ THE SOFTWARE.
                 <Label>Type</Label>
                 <ScriptBlock>
                   $_.providerType.name
-                </ScriptBlock>  
+                </ScriptBlock>
               </ListItem>
               <ListItem>
                 <Label>Regions</Label>
@@ -158,7 +210,7 @@ THE SOFTWARE.
                 <PropertyName>state</PropertyName>
               </ListItem>
             </ListItems>
-          </ListEntry>    
+          </ListEntry>
         </ListEntries>
       </ListControl>
     </View>
@@ -319,7 +371,7 @@ THE SOFTWARE.
       <TableControl>
         <AutoSize />
         <TableHeaders>
-        <TableColumnHeader>
+          <TableColumnHeader>
             <Label>Id</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
@@ -332,7 +384,7 @@ THE SOFTWARE.
           <TableRowEntry>
             <Wrap />
             <TableColumnItems>
-                          <TableColumnItem>
+              <TableColumnItem>
                 <PropertyName>id</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
@@ -351,7 +403,7 @@ THE SOFTWARE.
       <TableControl>
         <AutoSize />
         <TableHeaders>
-        <TableColumnHeader>
+          <TableColumnHeader>
             <Label>Uri</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
@@ -359,7 +411,7 @@ THE SOFTWARE.
             <Label>Name</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
-                    <TableColumnHeader>
+          <TableColumnHeader>
             <Label>Value</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
@@ -367,7 +419,7 @@ THE SOFTWARE.
             <Label>Unit</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
-                    <TableColumnHeader>
+          <TableColumnHeader>
             <Label>Active</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
@@ -376,19 +428,19 @@ THE SOFTWARE.
           <TableRowEntry>
             <Wrap />
             <TableColumnItems>
-                          <TableColumnItem>
+              <TableColumnItem>
                 <PropertyName>rateUri</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
                 <PropertyName>name</PropertyName>
               </TableColumnItem>
-                            <TableColumnItem>
+              <TableColumnItem>
                 <PropertyName>rateValue</PropertyName>
               </TableColumnItem>
-                                          <TableColumnItem>
+              <TableColumnItem>
                 <PropertyName>unit</PropertyName>
               </TableColumnItem>
-                                          <TableColumnItem>
+              <TableColumnItem>
                 <PropertyName>active</PropertyName>
               </TableColumnItem>
             </TableColumnItems>
@@ -504,10 +556,32 @@ THE SOFTWARE.
                   $_.deployment.zones | % {
                   "Id: {0}, Name: {1} `n`r" -f $_.id,$_.name
                   }
-                </ScriptBlock>  
+                </ScriptBlock>
               </ListItem>
             </ListItems>
-          </ListEntry>    
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
+      <Name>ZoneOSEndPoint</Name>
+      <ViewSelectedBy>
+        <TypeName>hpeonesphere.ZoneOSEndPoint</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>OS-Endpoints</Label>
+                <PropertyName>os-endpoints</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>OS-RC</Label>
+                <PropertyName>os-rc</PropertyName>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
         </ListEntries>
       </ListControl>
     </View>
@@ -531,35 +605,35 @@ THE SOFTWARE.
               <ListItem>
                 <Label>Description</Label>
                 <PropertyName>description</PropertyName>
-              </ListItem>  
+              </ListItem>
               <ListItem>
                 <Label>Type</Label>
                 <ScriptBlock>
                   $_.serviceType.name
-                </ScriptBlock> 
-              </ListItem>  
+                </ScriptBlock>
+              </ListItem>
               <ListItem>
                 <Label>Region</Label>
                 <PropertyName>regionUri</PropertyName>
-              </ListItem>  
+              </ListItem>
               <ListItem>
                 <Label>Zone</Label>
                 <ScriptBlock>
                   $_.zone.name
-                </ScriptBlock> 
-              </ListItem> 
+                </ScriptBlock>
+              </ListItem>
               <ListItem>
                 <Label>Catalog</Label>
                 <ScriptBlock>
                   $_.catalog.name
-                </ScriptBlock> 
+                </ScriptBlock>
               </ListItem>
               <ListItem>
                 <Label>Size (MB)</Label>
                 <PropertyName>sizeMB</PropertyName>
-              </ListItem>                                  
+              </ListItem>
             </ListItems>
-          </ListEntry>    
+          </ListEntry>
         </ListEntries>
       </ListControl>
     </View>
@@ -571,7 +645,7 @@ THE SOFTWARE.
       <TableControl>
         <AutoSize />
         <TableHeaders>
-        <TableColumnHeader>
+          <TableColumnHeader>
             <Label>Uri</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
@@ -584,11 +658,11 @@ THE SOFTWARE.
             <Alignment>Left</Alignment>
           </TableColumnHeader>
         </TableHeaders>
-         <TableRowEntries>
+        <TableRowEntries>
           <TableRowEntry>
             <Wrap />
             <TableColumnItems>
-                          <TableColumnItem>
+              <TableColumnItem>
                 <PropertyName>resourceUri</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
@@ -601,7 +675,7 @@ THE SOFTWARE.
               <TableColumnItem>
                 <ScriptBlock>
                   $_.values.value
-                </ScriptBlock>  
+                </ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>
@@ -640,7 +714,7 @@ THE SOFTWARE.
         </TableRowEntries>
       </TableControl>
     </View>
-        <View>
+    <View>
       <Name>CatalogType</Name>
       <ViewSelectedBy>
         <TypeName>hpeonesphere.CatalogType</TypeName>
@@ -680,7 +754,7 @@ THE SOFTWARE.
       <TableControl>
         <AutoSize />
         <TableHeaders>
-        <TableColumnHeader>
+          <TableColumnHeader>
             <Label>Id</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
@@ -693,7 +767,7 @@ THE SOFTWARE.
           <TableRowEntry>
             <Wrap />
             <TableColumnItems>
-                          <TableColumnItem>
+              <TableColumnItem>
                 <PropertyName>id</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
@@ -771,7 +845,7 @@ THE SOFTWARE.
       </ViewSelectedBy>
       <TableControl>
         <AutoSize />
-        <TableHeaders>          
+        <TableHeaders>
           <TableColumnHeader>
             <Label>Id</Label>
             <Alignment>Left</Alignment>
@@ -871,7 +945,7 @@ THE SOFTWARE.
       <TableControl>
         <AutoSize />
         <TableHeaders>
-                  <TableColumnHeader>
+          <TableColumnHeader>
             <Label>Id</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
@@ -942,14 +1016,14 @@ THE SOFTWARE.
       <ViewSelectedBy>
         <TypeName>hpeonesphere.Membership</TypeName>
       </ViewSelectedBy>
-            <TableControl>
+      <TableControl>
         <AutoSize/>
         <TableHeaders>
           <TableColumnHeader>
             <Label>User Id</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
-		      <TableColumnHeader>
+          <TableColumnHeader>
             <Label>Role Id</Label>
             <Alignment>Left</Alignment>
           </TableColumnHeader>
@@ -976,203 +1050,210 @@ THE SOFTWARE.
                 <ScriptBlock>
                     $_.projectUri.Substring(16)
                 </ScriptBlock>
-              </TableColumnItem>    
-            </TableColumnItems>      
-          </TableRowEntry>
-        </TableRowEntries>
-</TableControl>
-    </View>
-    <View>
-      <Name>User</Name>
-      <ViewSelectedBy>
-        <TypeName>hpeonesphere.User</TypeName>
-      </ViewSelectedBy>
-      <TableControl>
-        <AutoSize />
-        <TableHeaders>
-          <TableColumnHeader>
-            <Label>Id</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>Name</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>Role</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>Email</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-        </TableHeaders>
-        <TableRowEntries>
-          <TableRowEntry>
-            <Wrap />
-            <TableColumnItems>
-              <TableColumnItem>
-                <PropertyName>id</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>name</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>role</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>email</PropertyName>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>
         </TableRowEntries>
-      </TableControl>
+      </TableControl> 
     </View>
     <View>
-      <Name>Volume</Name>
-      <ViewSelectedBy>
-        <TypeName>hpeonesphere.Volume</TypeName>
-      </ViewSelectedBy>
-      <TableControl>
-        <AutoSize />
-        <TableHeaders>
-          <TableColumnHeader>
-            <Label>Id</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>Name</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>Description</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>Size (GB)</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>Status</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-        </TableHeaders>
-        <TableRowEntries>
-          <TableRowEntry>
-            <Wrap />
-            <TableColumnItems>
-              <TableColumnItem>
-                <PropertyName>id</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>name</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>description</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>sizeGiB</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>status</PropertyName>
-              </TableColumnItem>
-            </TableColumnItems>
-          </TableRowEntry>
-        </TableRowEntries>
-      </TableControl>
-    </View>
-    <View>
-      <Name>TagKey</Name>
-      <ViewSelectedBy>
-        <TypeName>hpeonesphere.TagKey</TypeName>
-      </ViewSelectedBy>
-      <TableControl>
-        <AutoSize />
-        <TableHeaders>
-          <TableColumnHeader>
-            <Label>Name</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-        </TableHeaders>
-        <TableRowEntries>
-          <TableRowEntry>
-            <Wrap />
-            <TableColumnItems>
-              <TableColumnItem>
-                <PropertyName>name</PropertyName>
-              </TableColumnItem>
-            </TableColumnItems>
-          </TableRowEntry>
-        </TableRowEntries>
-      </TableControl>
-    </View>
-    <View>
-      <Name>Tag</Name>
-      <ViewSelectedBy>
-        <TypeName>hpeonesphere.Tag</TypeName>
-      </ViewSelectedBy>
-      <TableControl>
-        <AutoSize />
-        <TableHeaders>
-          <TableColumnHeader>
-            <Label>Name</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>TagKey Name</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-        </TableHeaders>
-        <TableRowEntries>
-          <TableRowEntry>
-            <Wrap />
-            <TableColumnItems>
-              <TableColumnItem>
-                <PropertyName>name</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <ScriptBlock>if (-not($_.tagKeyUri)) { 'No TagKey' }
+        <Name>User</Name>
+        <ViewSelectedBy>
+          <TypeName>hpeonesphere.User</TypeName>
+        </ViewSelectedBy>
+        <TableControl>
+          <AutoSize />
+          <TableHeaders>
+            <TableColumnHeader>
+              <Label>Id</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>Name</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>Role</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>Email</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>IsLocal</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+          </TableHeaders>
+          <TableRowEntries>
+            <TableRowEntry>
+              <Wrap />
+              <TableColumnItems>
+                <TableColumnItem>
+                  <PropertyName>id</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <PropertyName>name</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <PropertyName>role</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <PropertyName>email</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <PropertyName>isLocal</PropertyName>
+                </TableColumnItem>
+              </TableColumnItems>
+            </TableRowEntry>
+          </TableRowEntries>
+        </TableControl>
+      </View>
+      <View>
+        <Name>Volume</Name>
+        <ViewSelectedBy>
+          <TypeName>hpeonesphere.Volume</TypeName>
+        </ViewSelectedBy>
+        <TableControl>
+          <AutoSize />
+          <TableHeaders>
+            <TableColumnHeader>
+              <Label>Id</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>Name</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>Description</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>Size (GB)</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>Status</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+          </TableHeaders>
+          <TableRowEntries>
+            <TableRowEntry>
+              <Wrap />
+              <TableColumnItems>
+                <TableColumnItem>
+                  <PropertyName>id</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <PropertyName>name</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <PropertyName>description</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <PropertyName>sizeGiB</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <PropertyName>status</PropertyName>
+                </TableColumnItem>
+              </TableColumnItems>
+            </TableRowEntry>
+          </TableRowEntries>
+        </TableControl>
+      </View>
+      <View>
+        <Name>TagKey</Name>
+        <ViewSelectedBy>
+          <TypeName>hpeonesphere.TagKey</TypeName>
+        </ViewSelectedBy>
+        <TableControl>
+          <AutoSize />
+          <TableHeaders>
+            <TableColumnHeader>
+              <Label>Name</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+          </TableHeaders>
+          <TableRowEntries>
+            <TableRowEntry>
+              <Wrap />
+              <TableColumnItems>
+                <TableColumnItem>
+                  <PropertyName>name</PropertyName>
+                </TableColumnItem>
+              </TableColumnItems>
+            </TableRowEntry>
+          </TableRowEntries>
+        </TableControl>
+      </View>
+      <View>
+        <Name>Tag</Name>
+        <ViewSelectedBy>
+          <TypeName>hpeonesphere.Tag</TypeName>
+        </ViewSelectedBy>
+        <TableControl>
+          <AutoSize />
+          <TableHeaders>
+            <TableColumnHeader>
+              <Label>Name</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>TagKey Name</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+          </TableHeaders>
+          <TableRowEntries>
+            <TableRowEntry>
+              <Wrap />
+              <TableColumnItems>
+                <TableColumnItem>
+                  <PropertyName>name</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <ScriptBlock>if (-not($_.tagKeyUri)) { 'No TagKey' }
                   else {
                           $FullUri = $Global:HPEOSHostname + $_.tagKeyUri
                           $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method GET
                           $res.name                        }</ScriptBlock>
-              </TableColumnItem>
-            </TableColumnItems>
-          </TableRowEntry>
-        </TableRowEntries>
-      </TableControl>
-    </View>
-    <View>
-      <Name>MembershipRole</Name>
-      <ViewSelectedBy>
-        <TypeName>hpeonesphere.MembershipRole</TypeName>
-      </ViewSelectedBy>
-      <TableControl>
-        <AutoSize />
-        <TableHeaders>
-          <TableColumnHeader>
-            <Label>Id</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>DisplayName</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-        </TableHeaders>
-        <TableRowEntries>
-          <TableRowEntry>
-            <Wrap />
-            <TableColumnItems>
-              <TableColumnItem>
-                <PropertyName>id</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>displayName</PropertyName>
-              </TableColumnItem>
-            </TableColumnItems>
-          </TableRowEntry>
-        </TableRowEntries>
-      </TableControl>
-    </View>
-  </ViewDefinitions>
-</Configuration>
+                </TableColumnItem>
+              </TableColumnItems>
+            </TableRowEntry>
+          </TableRowEntries>
+        </TableControl>
+      </View>
+      <View>
+        <Name>MembershipRole</Name>
+        <ViewSelectedBy>
+          <TypeName>hpeonesphere.MembershipRole</TypeName>
+        </ViewSelectedBy>
+        <TableControl>
+          <AutoSize />
+          <TableHeaders>
+            <TableColumnHeader>
+              <Label>Id</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+            <TableColumnHeader>
+              <Label>DisplayName</Label>
+              <Alignment>Left</Alignment>
+            </TableColumnHeader>
+          </TableHeaders>
+          <TableRowEntries>
+            <TableRowEntry>
+              <Wrap />
+              <TableColumnItems>
+                <TableColumnItem>
+                  <PropertyName>id</PropertyName>
+                </TableColumnItem>
+                <TableColumnItem>
+                  <PropertyName>displayName</PropertyName>
+                </TableColumnItem>
+              </TableColumnItems>
+            </TableRowEntry>
+          </TableRowEntries>
+        </TableControl>
+      </View>
+    </ViewDefinitions>
+  </Configuration>
