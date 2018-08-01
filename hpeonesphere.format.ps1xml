@@ -574,11 +574,15 @@ THE SOFTWARE.
             <ListItems>
               <ListItem>
                 <Label>OS-Endpoints</Label>
-                <PropertyName>os-endpoints</PropertyName>
+                  <ScriptBlock>
+                   $_.'os-endpoints'
+                  </ScriptBlock>
               </ListItem>
               <ListItem>
                 <Label>OS-RC</Label>
-                <PropertyName>os-rc</PropertyName>
+                  <ScriptBlock>
+                  $_.'os-rc'
+                  </ScriptBlock>
               </ListItem>
             </ListItems>
           </ListEntry>

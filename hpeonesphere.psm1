@@ -66,6 +66,7 @@ if ((Get-Host).UI.RawUI.MaxWindowSize.width -lt 150)
 }
 write-host ""
 
+$Global:FormatEnumerationLimit=64
 $debugMode = $false
 
 #Note: Set $debugPreference to control debug logging
@@ -1086,7 +1087,11 @@ Optional: zone object to query
 .DESCRIPTION
 Retrieves zones os endpoints from OneSphere Management portal. Assumes portal is already connected
 .EXAMPLE
-GET-HPEOSZoneOsEndPoint
+GET-HPEOSZoneOsEndPoint $myzone
+.EXAMPLE
+GET-HPEOSZoneOsEndPoint $myzone -osrc
+.EXAMPLE
+GET-HPEOSZoneOsEndPoint $myzone -osendpoints
 .Notes
     NAME:  GET-HPEOSZoneOsEndPoint -zone $MyZone
     LASTEDIT: 
@@ -1101,7 +1106,14 @@ function Get-HPEOSZoneOsEndPoint
 	(
         [Parameter(Mandatory, ValueFromPipeline=$True)]
         [ValidateNotNullorEmpty()]
-        [Object]$Zone
+        [Object]$Zone,
+        
+        [Parameter(Mandatory=$False)]
+        [switch]$osrc,
+
+        [Parameter(Mandatory=$False)]
+        [switch]$osendpoints
+
     )
 
         Begin
@@ -1125,11 +1137,14 @@ function Get-HPEOSZoneOsEndPoint
             catch {
                 $PSCmdlet.ThrowTerminatingError($_)
             } 
-        
             $ResultSet = $res
             $ResultType = 'hpeonesphere.ZoneOSEndPoint'
+
+            if ($osrc)
+                { $ResultSet = $res.'os-rc'}
+            elseif ($osendpoints)
+                { $ResultSet = $res.'os-endpoints'}
         }
-        
         End
         {
             # return full list from ResultSet 
