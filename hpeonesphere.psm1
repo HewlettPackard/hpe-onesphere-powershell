@@ -6329,7 +6329,7 @@ Retrieves metrics about resources from OneSphere Management portal. Assumes port
 .EXAMPLE
 GET-HPEOSMetric -ResourceUri /rest/Projects/85609a9e-31f5-4c7b-bd54-1ba50136bdf6 -start 2017-09-01T00:00:00Z -period hour -MetricName resource.cores.allocation  
 .EXAMPLE
-GET-HPEOSMetrics -Category regions -name score.overall -Period hour -PeriodCount 1
+GET-HPEOSMetric -Category regions -name score.overall -Period hour -PeriodCount 1
 .Notes
     NAME:  GET-HPEOSMetric
     LASTEDIT: 
