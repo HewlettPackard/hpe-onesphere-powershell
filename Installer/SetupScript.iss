@@ -65,7 +65,11 @@ Source: "..\en-US\about_HPEOS.help.txt"; DestDir: "{app}\en-US"; Flags: ignoreve
 ;Source: "..\Installer\Unattended\*"; DestDir: "{app}\Unattended"; Flags: ignoreversion recursesubdirs
 
 ; SAMPLE SCRIPTS
-Source: "..\Samples\hpeos-tests.ps1"; DestDir: "{app}\Samples"; Flags: ignoreversion
+//Source: "..\Samples\hpeos-tests.ps1"; DestDir: "{app}\Samples"; Flags: ignoreversion
+//Source: "..\Samples\Export-OSResources.ps1"; DestDir: "{app}\Samples"; Flags: ignoreversion
+//Source: "..\Samples\Import-OSResources.ps1"; DestDir: "{app}\Samples"; Flags: ignoreversion
+Source: "..\Samples\*"; DestDir: "{app}\Samples"; Flags: ignoreversion
+Source: "..\Samples\ImportOneSphereCSV\*"; DestDir: "{app}\Samples\ImportOneSphereCSV"; Flags: ignoreversion
 
 
 [Icons]
