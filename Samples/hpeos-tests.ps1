@@ -39,7 +39,7 @@ Param
 $ErrorActionPreference = 'Continue'
 
 remove-module hpeonesphere
-import-module ./hpeonesphere.psm1
+import-module hpeonesphere.psm1
 
 
 $secpasswd = ConvertTo-SecureString $Password -AsPlainText -Force
