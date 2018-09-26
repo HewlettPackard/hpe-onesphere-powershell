@@ -32,7 +32,7 @@ THE SOFTWARE.
  Windows Management Framework (aka PowerShell) 4: https://www.microsoft.com/en-us/download/details.aspx?id=40855
 #>
 
-[Version]$ModuleVersion = '1.0'
+[Version]$ModuleVersion = '1.1'
 
 # Import-Module Text
 $_WelcomeTitle = "Welcome to the HPE OneSphere POSH Library, v{0}" -f $ModuleVersion.ToString()
@@ -66,6 +66,7 @@ if ((Get-Host).UI.RawUI.MaxWindowSize.width -lt 150)
 }
 write-host ""
 
+$Global:FormatEnumerationLimit=64
 $debugMode = $false
 
 #Note: Set $debugPreference to control debug logging
@@ -142,6 +143,10 @@ $Script:PatchOperationReplace       = "replace"
 [String]$script:ApplianceUri                        = "/rest/appliances"
 [String]$script:PasswordResetUri                    = "/rest/password-reset"
 [String]$script:PasswordChangeUri                   = "/rest/password-reset/change"
+[String]$script:VersionUri                          = "/rest/about/versions"
+[String]$script:BillingAccountUri                   = "/rest/billing-accounts"
+
+
 
 
 [string]$script:IPSubnetAddressPattern     = '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' +
@@ -151,6 +156,7 @@ $Script:PatchOperationReplace       = "replace"
 											 '(/0*([1-9]|[12][0-9]|3[0-2]))?$'
 
 $Global:HPEOSHeaders = @{}
+$Global:HPEOSHeadersXHpeMediaType = "X-Hpe-Media-Type"
 
 [string]$Global:HPEOSHostname
 [boolean]$Global:HPEOSPortalConnected  = $false
@@ -202,12 +208,69 @@ function Get-HPEOSstatus
 
         try {
             $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method GET
-            $status = $res.service
-            Write-Output "Status of HPE OneSphere is: $status"
+            $res.service
+            #Write-Output "Status of HPE OneSphere is: $status"
             }
         catch 
         {
-                        $PSCmdlet.ThrowTerminatingError($_) 
+            $PSCmdlet.ThrowTerminatingError($_) 
+        }
+    }		
+}
+<#
+.SYNOPSIS
+Retrieves version from OneSphere Management portal API
+.PARAMETER portal
+Optional: The URL to the OneSphere Portal (Required if not already connected)
+.DESCRIPTION
+Retrieves API version from OneSphere Management portal
+.EXAMPLE
+GET-HPEOSversion
+.EXAMPLE
+GET-HPEOSversion -portal https://myonesphereportal.hpe.com
+.Notes
+    NAME:  GET-HPEOSversion
+    LASTEDIT: 
+    KEYWORDS: OneSphere 
+  
+.Link
+     http://www.hpe.com/onesphere
+#>
+function Get-HPEOSversion
+{
+    [CmdletBinding()]
+    Param
+	(
+		[Parameter(Mandatory=$False)]
+		[string]$portal
+	)
+    Process        
+        {
+        if (!$Global:HPEOSPortalConnected  -and !$portal)
+            {
+            Throw "Not connected to any OneSphere portal"
+        }
+
+        if (!$portal) {
+            $portal = $Global:HPEOSHostname
+        }
+
+        $AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls,Tls11,Tls12'
+        [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
+
+        $FullUri = $portal + $script:VersionUri 
+        write-debug "FullUri is $FullUri"
+
+        try {
+            # use WebResquest here as WebMethod doesn't allow to get the response headers
+            $res = invoke-WebRequest -Uri $FullUri -Headers $Global:HPEOSHeaders  -Method GET
+
+            ($res.Headers.'X-Hpe-Media-Type').split(";")[1].split("=")[1]
+            #Write-Output "Version of HPE OneSphere API is: $version"
+            }
+        catch 
+        {
+        $PSCmdlet.ThrowTerminatingError($_) 
         }
     }		
 }
@@ -900,7 +963,7 @@ Retrieves Zone connections from OneSphere Management portal
 .PARAMETER Zone
 Optional: Zone object to query
 .DESCRIPTION
-Retrieves Zones from OneSphere Management portal. Assumes portal is already connected
+Retrieves Zones connections from OneSphere Management portal. Assumes portal is already connected
 .EXAMPLE
 GET-HPEOSZoneConnection
 .Notes
@@ -1015,6 +1078,85 @@ function Get-HPEOSZoneApplianceImage
         {
         }
 }
+
+<#
+.SYNOPSIS
+Retrieves zone os endpoints from OneSphere Management portal
+.PARAMETER Zone
+Optional: zone object to query
+.DESCRIPTION
+Retrieves zones os endpoints from OneSphere Management portal. Assumes portal is already connected
+.EXAMPLE
+GET-HPEOSZoneOsEndPoint $myzone
+.EXAMPLE
+GET-HPEOSZoneOsEndPoint $myzone -osrc
+.EXAMPLE
+GET-HPEOSZoneOsEndPoint $myzone -osendpoints
+.Notes
+    NAME:  GET-HPEOSZoneOsEndPoint -zone $MyZone
+    LASTEDIT: 
+    KEYWORDS: OneSphere 
+  
+.Link
+     http://www.hpe.com/onesphere
+#>
+function Get-HPEOSZoneOsEndPoint
+{
+    Param
+	(
+        [Parameter(Mandatory, ValueFromPipeline=$True)]
+        [ValidateNotNullorEmpty()]
+        [Object]$Zone,
+        
+        [Parameter(Mandatory=$False)]
+        [switch]$osrc,
+
+        [Parameter(Mandatory=$False)]
+        [switch]$osendpoints
+
+    )
+
+        Begin
+        {
+        if (!$Global:HPEOSPortalConnected  )
+            {
+            Throw "Not connected to any OneSphere portal"
+            } 
+        }
+    
+        Process
+        {
+
+            $FullUri = $Global:HPEOSHostname + $Zone.uri + "/os-endpoints"
+            write-debug "FullUri is $FullUri"  
+    
+            try {
+                $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method GET
+                write-debug "Response from API call: $res"    
+            }
+            catch {
+                $PSCmdlet.ThrowTerminatingError($_)
+            } 
+            $ResultSet = $res
+            $ResultType = 'hpeonesphere.ZoneOSEndPoint'
+
+            if ($osrc)
+                { $ResultSet = $res.'os-rc'}
+            elseif ($osendpoints)
+                { $ResultSet = $res.'os-endpoints'}
+        }
+        End
+        {
+            # return full list from ResultSet 
+            foreach ($Result in $ResultSet)
+                {
+                $Result.PSObject.TypeNames.Insert(0,$ResultType)
+                write-output $Result         
+                }
+        }
+}
+
+
 <#
 .SYNOPSIS
 Reduce compute capacity to Zone in OneSphere Management portal
@@ -3283,6 +3425,114 @@ function Get-HPEOSTag
             }
     }   
 }
+<#
+.SYNOPSIS
+Retrieves billing accounts from OneSphere Management portal
+.PARAMETER BillingAccountId
+Optional: BillingAccountId to retrieve
+.PARAMETER query
+Optional: query to filter accounts
+.PARAMETER Full
+Optional: Return related resources
+.DESCRIPTION
+Retrieves billing accounts from OneSphere Management portal. Assumes portal is already connected
+.EXAMPLE
+Get-HPEOSBillingAccount
+.EXAMPLE
+Get-HPEOSBillingAccount -id $MyAccount
+.Notes
+    NAME:  Get-HPEOSBillingAccount
+    LASTEDIT: 
+    KEYWORDS: OneSphere 
+  
+.Link
+     http://www.hpe.com/onesphere
+#>
+function Get-HPEOSBillingAccount
+{
+    [CmdletBinding(DefaultParameterSetName="List")]
+    Param
+	(
+        [Parameter(Mandatory=$False, ValueFromPipeline=$True, ParameterSetName = "Single")]
+        [alias ('id')]
+		[string]$BillingAccountId,
+        
+        [Parameter(Mandatory=$False, ParameterSetName = "List")]
+        [alias ('name')]
+        [string]$Query,
+
+        [Parameter(Mandatory=$False, ParameterSetName = "List")]
+        [Parameter(Mandatory=$False, ParameterSetName = "Single")]
+        [switch]$Full
+	)
+    Begin
+    {
+    if (!$Global:HPEOSPortalConnected )
+        {
+        Throw "Not connected to any OneSphere portal"
+        } 
+    }
+    Process
+    {
+        $FullUriSuffix = "" 
+        $SuffixChar = "?"
+
+        if ($ProjectId){
+            $FullUri = $Global:HPEOSHostname + $Script:BillingAccountUri + "/" + $BillingAccountId 
+        }
+        else {
+            $FullUri = $Global:HPEOSHostname + $Script:BillingAccountUri 
+            
+            if ($Query){
+                $FullUriSuffix = "?Query=" + $Query
+                $SuffixChar = "&"
+                }
+        }
+
+        if ($Full) {
+            $FullUriSuffix = $FullUriSuffix + $SuffixChar + "view=full"  
+            }
+
+        $FullUri = $FullUri + $FullUriSuffix
+        write-debug "FullUri is $FullUri"  
+        try {
+            $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method GET
+            write-debug "Response from API call: $res" 
+            if ($res.count -lt $res.total)
+                # We have more data to fetch
+                {
+                $start = $res.count
+                $count = $res.total - $res.count
+                
+                $UriSuffix = $SuffixChar + "start=" + $start + "&count=" + $count
+                $FullUri += $UriSuffix
+                write-debug "FullUri is $FullUri" 
+                $res2 = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -Method GET
+                write-debug "Response from API call: $res2"
+                $res.members += $res2.members     
+                }          
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        } 
+        If ($ProjectId) {
+            $ResultSet = $res
+        }
+        else {
+            $ResultSet = $res.members
+        }
+        $ResultType = 'hpeonesphere.BillingAccount'
+    }
+    End
+    {
+        # return full list from ResultSet 
+        foreach ($Result in $ResultSet)
+            {
+            $Result.PSObject.TypeNames.Insert(0,$ResultType)
+            write-output $Result         
+            }
+    }
+}
 
 function ValidateObjectType
 { 
@@ -5048,10 +5298,16 @@ Project to deploy to
 Service to deploy
 .PARAMETER VirtualMachineProfile
 VirtualMachineProfile to deploy
-.PARAMETER Zone
-Zone to deploy to
 .PARAMETER Networks
 List of Networks to connect to
+.PARAMETER Zone
+Optional: Zone to deploy to
+.PARAMETER Region
+Optional: Region to deploy to
+.PARAMETER Key
+Optional: Public key to pass to deployed instance
+.PARAMETER UserData
+Optional: User data to pass to deployed instance (cloud-init)
 .PARAMETER NeedExternalIP
 Optional: If External IP is required 
 .DESCRIPTION
@@ -5993,6 +6249,78 @@ function Add-HPEOSTag
 
 <#
 .SYNOPSIS
+Adds a billing account to OneSphere Management portal
+.PARAMETER BillingAccountName
+Billing account name
+.DESCRIPTION
+Adds billing account to OneSphere Management portal. Assumes portal is already connected
+.EXAMPLE
+ADD-HPEOSBillingAccount
+.EXAMPLE
+Add-HPEOSBillingAccount -name Newaccount
+.Notes
+    NAME:  ADD-HPEOSBillingAccount
+    LASTEDIT: 
+    KEYWORDS: OneSphere 
+  
+.Link
+     http://www.hpe.com/onesphere
+#>
+function Add-HPEOSBillingAccount
+{
+
+   	[CmdletBinding ()]
+	Param 
+	(
+		[Parameter (Mandatory)]
+		[ValidateNotNullorEmpty()]
+        [alias ('name')]
+		[string]$BillingAccountName,
+
+        [Parameter (Mandatory)]
+		[ValidateNotNullorEmpty()]
+		[Object]$TagKey
+
+    )
+
+    begin 
+    {
+    if (!$Global:HPEOSPortalConnected )
+        {
+        Throw "Not connected to any OneSphere portal"                
+        }
+    }
+
+    Process
+        {
+        $body = @{
+            "name" = $TagName
+            "tagKeyUri" = $TagKey.uri
+        }
+          
+        $jsonbody = ConvertTo-Json -InputObject $body
+        $FullUri = $Global:HPEOSHostname + $Script:TagUri 
+        write-debug "FullUri is $FullUri"                 
+        write-debug $jsonbody
+
+        try {
+            $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -body $jsonbody -Method POST
+            Write-verbose "Tag $TageName added successfully"
+            write-output $res
+        }
+        catch
+        {
+            write-verbose  "Failed to create Tag"
+            $PSCmdlet.ThrowTerminatingError($_)
+        }   
+    }   
+}
+
+
+
+
+<#
+.SYNOPSIS
 Wait for object state to become enabled
 .PARAMETER Object
 Object to query
@@ -6088,7 +6416,7 @@ Retrieves metrics about resources from OneSphere Management portal. Assumes port
 .EXAMPLE
 GET-HPEOSMetric -ResourceUri /rest/Projects/85609a9e-31f5-4c7b-bd54-1ba50136bdf6 -start 2017-09-01T00:00:00Z -period hour -MetricName resource.cores.allocation  
 .EXAMPLE
-GET-HPEOSMetrics -Category regions -name score.overall -Period hour -PeriodCount 1
+GET-HPEOSMetric -Category regions -name score.overall -Period hour -PeriodCount 1
 .Notes
     NAME:  GET-HPEOSMetric
     LASTEDIT: 
@@ -6310,6 +6638,7 @@ function Get-HPEOSKeyPair
 # The GET
 
 Export-ModuleMember -function Get-HPEOSStatus
+Export-ModuleMember -function Get-HPEOSVersion
 Export-ModuleMember -function Get-HPEOSProvider
 Export-ModuleMember -function Get-HPEOSProviderType
 Export-ModuleMember -function Get-HPEOSRegion
@@ -6317,6 +6646,7 @@ Export-ModuleMember -function Get-HPEOSZone
 Export-ModuleMember -function Get-HPEOSZoneApplianceImage
 Export-ModuleMember -function Get-HPEOSZoneTaskStatus
 Export-ModuleMember -function Get-HPEOSZoneConnection
+Export-ModuleMember -function Get-HPEOSZoneOsEndPoint
 Export-ModuleMember -function Get-HPEOSZoneType
 Export-ModuleMember -function Get-HPEOSCatalog
 Export-ModuleMember -function Get-HPEOSCatalogType
@@ -6339,6 +6669,8 @@ Export-ModuleMember -function GET-HPEOSKeyPair
 Export-ModuleMember -function GET-HPEOSConnectApp
 Export-ModuleMember -function Get-HPEOSAppliance
 Export-ModuleMember -function Get-HPEOSRate
+Export-ModuleMember -function Get-HPEOSBillingAccount
+
 
 
 # The DELETE
@@ -6382,6 +6714,8 @@ Export-ModuleMember -function Suspend-HPEOSDeployment
 Export-ModuleMember -function Restart-HPEOSDeployment
 Export-ModuleMember -function Get-HPEOSDeploymentConsole
 Export-ModuleMember -function Add-HPEOSVolume
+Export-ModuleMember -function Add-HPEOSBillingAccount
+
 
 # The PATCH
 Export-ModuleMember -function Set-HPEOSCatalog
