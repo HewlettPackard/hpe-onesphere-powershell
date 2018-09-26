@@ -5,10 +5,10 @@
 
 #define MyAppName "HPE OneSphere PowerShell Library"
 #define MyAppNameShort "hpeonesphere"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1"
 #define MyAppPublisher "Hewlett Packard Enterprise"
 #define MyAppPublisherShort "HPE"
-#define MyAppURL "https://github.hpe.com/panormos/ns-api-ps"
+#define MyAppURL "https://github.com/HewlettPackard/hpe-onesphere-powershell"
 #define MyAppId "{d90ead4f-7fdd-4817-91f3-b304ccd56e8d}"
 #define MySetupImageIco ".\Icon.ico"
 
@@ -16,7 +16,7 @@
 SetupIconFile={#MySetupImageIco}
 ;UninstallDisplayIcon={#MySetupImageIco}
 AllowNoIcons=yes
-AppCopyright=© Copyright 2017-2018 Hewlett Packard Enterprise Development LP
+AppCopyright=© Copyright 2018 Hewlett Packard Enterprise Development LP
 AppId={{#MyAppId}
 AppName={#MyAppName}
 AppPublisher={#MyAppPublisher}
