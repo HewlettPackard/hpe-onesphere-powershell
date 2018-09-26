@@ -6249,6 +6249,78 @@ function Add-HPEOSTag
 
 <#
 .SYNOPSIS
+Adds a billing account to OneSphere Management portal
+.PARAMETER BillingAccountName
+Billing account name
+.DESCRIPTION
+Adds billing account to OneSphere Management portal. Assumes portal is already connected
+.EXAMPLE
+ADD-HPEOSBillingAccount
+.EXAMPLE
+Add-HPEOSBillingAccount -name Newaccount
+.Notes
+    NAME:  ADD-HPEOSBillingAccount
+    LASTEDIT: 
+    KEYWORDS: OneSphere 
+  
+.Link
+     http://www.hpe.com/onesphere
+#>
+function Add-HPEOSBillingAccount
+{
+
+   	[CmdletBinding ()]
+	Param 
+	(
+		[Parameter (Mandatory)]
+		[ValidateNotNullorEmpty()]
+        [alias ('name')]
+		[string]$BillingAccountName,
+
+        [Parameter (Mandatory)]
+		[ValidateNotNullorEmpty()]
+		[Object]$TagKey
+
+    )
+
+    begin 
+    {
+    if (!$Global:HPEOSPortalConnected )
+        {
+        Throw "Not connected to any OneSphere portal"                
+        }
+    }
+
+    Process
+        {
+        $body = @{
+            "name" = $TagName
+            "tagKeyUri" = $TagKey.uri
+        }
+          
+        $jsonbody = ConvertTo-Json -InputObject $body
+        $FullUri = $Global:HPEOSHostname + $Script:TagUri 
+        write-debug "FullUri is $FullUri"                 
+        write-debug $jsonbody
+
+        try {
+            $res = invoke-RestMethod -Uri $FullUri -Headers $Global:HPEOSHeaders -body $jsonbody -Method POST
+            Write-verbose "Tag $TageName added successfully"
+            write-output $res
+        }
+        catch
+        {
+            write-verbose  "Failed to create Tag"
+            $PSCmdlet.ThrowTerminatingError($_)
+        }   
+    }   
+}
+
+
+
+
+<#
+.SYNOPSIS
 Wait for object state to become enabled
 .PARAMETER Object
 Object to query
@@ -6642,6 +6714,8 @@ Export-ModuleMember -function Suspend-HPEOSDeployment
 Export-ModuleMember -function Restart-HPEOSDeployment
 Export-ModuleMember -function Get-HPEOSDeploymentConsole
 Export-ModuleMember -function Add-HPEOSVolume
+Export-ModuleMember -function Add-HPEOSBillingAccount
+
 
 # The PATCH
 Export-ModuleMember -function Set-HPEOSCatalog
