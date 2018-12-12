@@ -32,7 +32,7 @@ THE SOFTWARE.
  Windows Management Framework (aka PowerShell) 4: https://www.microsoft.com/en-us/download/details.aspx?id=40855
 #>
 
-[Version]$ModuleVersion = '1.1'
+[Version]$ModuleVersion = '1.1.12.12.2018'
 
 # Import-Module Text
 $_WelcomeTitle = "Welcome to the HPE OneSphere POSH Library, v{0}" -f $ModuleVersion.ToString()
