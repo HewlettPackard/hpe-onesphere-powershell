@@ -32,7 +32,7 @@ THE SOFTWARE.
  Windows Management Framework (aka PowerShell) 4: https://www.microsoft.com/en-us/download/details.aspx?id=40855
 #>
 
-[Version]$ModuleVersion = '1.1'
+[Version]$ModuleVersion = '1.1.12.12'
 
 # Import-Module Text
 $_WelcomeTitle = "Welcome to the HPE OneSphere POSH Library, v{0}" -f $ModuleVersion.ToString()
@@ -161,6 +161,17 @@ $Global:HPEOSHeadersXHpeMediaType = "X-Hpe-Media-Type"
 [string]$Global:HPEOSHostname
 [boolean]$Global:HPEOSPortalConnected  = $false
 
+function cleanup_url { Param ([string] $portal) 
+    if ($portal.endswith('/')) { $portal = $portal.substring(0,$portal.length - 1)}
+    if (! $portal.startswith("http")) { $portal="https://" + $portal}
+
+    return $Portal
+}
+
+function set_securityprotocols {  
+    $AllProtocols = [System.Net.SecurityProtocolType]'Tls,Tls11,Tls12'
+    [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
+}
 
 <#
 .SYNOPSIS
@@ -198,10 +209,12 @@ function Get-HPEOSstatus
 
         if (!$portal) {
             $portal = $Global:HPEOSHostname
+        } else {
+            # Cleanup $Portal
+            $Portal=cleanup_url($Portal)
         }
 
-        $AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls,Tls11,Tls12'
-        [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
+        set_securityprotocols
 
         $FullUri = $portal + $script:StatusUri 
         write-debug "FullUri is $FullUri"
@@ -250,14 +263,16 @@ function Get-HPEOSversion
             {
             Throw "Not connected to any OneSphere portal"
         }
-
+        
         if (!$portal) {
             $portal = $Global:HPEOSHostname
+        } else {
+            # Cleanup $Portal
+            $Portal=cleanup_url($Portal)
         }
 
-        $AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls,Tls11,Tls12'
-        [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
-
+        set_securityprotocols
+        
         $FullUri = $portal + $script:VersionUri 
         write-debug "FullUri is $FullUri"
 
@@ -313,9 +328,12 @@ function Connect-HPEOS
         $Global:HPEOSHeaders["Accept"] = "application/json"
         $Global:HPEOSHeaders["Content-Type"] = "application/json"
 
-        $AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls,Tls11,Tls12'
-        [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
+        # Cleanup $Portal
+        $Portal=cleanup_url($Portal)
 
+        set_securityprotocols
+        
+                
         $password = $Credentials.GetNetworkCredential().Password
         $user = $Credentials.Username
         $Global:HPEOSHostname = $Portal
