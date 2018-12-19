@@ -26,7 +26,7 @@ THE SOFTWARE.
 RootModule = 'hpeonesphere.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.1.12.12'
+ModuleVersion = '1.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()

@@ -5,7 +5,7 @@
 
 #define MyAppName "HPE OneSphere PowerShell Library"
 #define MyAppNameShort "hpeonesphere"
-#define MyAppVersion "1.1"
+#define MyAppVersion "1.2"
 #define MyAppPublisher "Hewlett Packard Enterprise"
 #define MyAppPublisherShort "HPE"
 #define MyAppURL "https://github.com/HewlettPackard/hpe-onesphere-powershell"

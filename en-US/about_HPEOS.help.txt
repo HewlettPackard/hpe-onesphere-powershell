@@ -47,7 +47,8 @@ SHORT DESCRIPTION
 
 	WHAT'S NEW
 
-
+	Support added for Microsoft PowerShell Code (Preview 6.2).
+	Tested on Windows 10 and MacOS.
 
 
 	Powershell bindings for the OneSphere REST API
