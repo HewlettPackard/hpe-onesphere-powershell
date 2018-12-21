@@ -45,7 +45,7 @@ Copyright = '(C) Copyright 2013-2018 Hewlett-Packard Development Company, L.P.'
 Description = 'HPE OneSphere PowerShell Library'
 
 # Minimum version of the Windows PowerShell engine required by this module
-PowerShellVersion = '4.0'
+PowerShellVersion = '5.0'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
@@ -127,8 +127,8 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'hpeonesphere - Version 1.1
-        August 31, 2018
+        ReleaseNotes = 'hpeonesphere - Version 1.2
+        December 21, 2018
         
         Check https://github.com/HewlettPackard/hpe-onesphere-powershell for more details and samples.
 
